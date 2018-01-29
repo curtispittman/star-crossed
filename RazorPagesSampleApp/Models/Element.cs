@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace RazorPagesSampleApp.Models
 {
-    public class Todo
+    public class Element
     {
-        public Todo()
+        public Element()
         {
             Id = Guid.NewGuid();
         }
@@ -16,5 +16,8 @@ namespace RazorPagesSampleApp.Models
 
         [Required]
         public string Description { get; set; }
+        public bool IsStarred { get; set; }
+        public bool WasStarred { get; set; }
+        public bool IsCrossed { get; set; }
     }
 }

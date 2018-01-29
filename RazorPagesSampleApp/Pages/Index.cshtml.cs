@@ -10,23 +10,23 @@ namespace RazorPagesSampleApp.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ITodoRepository _todoRepository;
-        public IndexModel(ITodoRepository todoRepository)
+        private readonly IElementRepository _elementRepository;
+        public IndexModel(IElementRepository elementRepository)
         {
-            _todoRepository = todoRepository;
+            _elementRepository = elementRepository;
         }
         [TempData]
         public string Message { get; set; }
 
         [BindProperty]
-        public IEnumerable<Todo> Todos { get; private set; }
+        public IEnumerable<Element> Elements { get; private set; }
 
         public async Task OnGetAsync()
         {
-            await GetTodos();
+            await GetElements();
         }
 
-        public async Task<IActionResult> OnPostAsync(Todo todo)
+        public async Task<IActionResult> OnPostAsync(Element element)
         {
             await OnGetAsync();
             if (!ModelState.IsValid)
@@ -34,16 +34,47 @@ namespace RazorPagesSampleApp.Pages
                 return Page();
             }
             
-            await _todoRepository.Add(todo);
-            Message = $"Added: {todo.Description}";
+            await _elementRepository.Add(element);
+            Message = $"Added: {element.Description}";
             return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostClearListAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+            await _elementRepository.RemoveAll();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostStarAsync(Guid id)
+        {
+            if (ModelState.IsValid)
+            {
+                await _elementRepository.Star(id);
+                return RedirectToPage();
+            }
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostCrossAsync(Guid id)
+        {
+            if (ModelState.IsValid)
+            {
+                await _elementRepository.Cross(id);
+                return RedirectToPage();
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostRemoveAsync(Guid id)
         {
             if (ModelState.IsValid)
             {
-                await _todoRepository.Remove(id);
+                await _elementRepository.Remove(id);
                 return RedirectToPage();
             }
             return Page();
@@ -54,14 +85,14 @@ namespace RazorPagesSampleApp.Pages
             {
                 return Page();
             }
-            if ((await _todoRepository.Find(id) != null))
+            if ((await _elementRepository.Find(id) != null))
                 return RedirectToPage("Edit", new { id = id });
 
             return Page();
         }
-        private async Task GetTodos()
+        private async Task GetElements()
         {
-            Todos = await _todoRepository.GetAll();
+            Elements = await _elementRepository.GetAll();
         }
     }
 }

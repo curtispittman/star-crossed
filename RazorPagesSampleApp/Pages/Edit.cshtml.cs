@@ -10,33 +10,33 @@ namespace RazorPagesSampleApp.Pages
 {
     public class EditModel : PageModel
     {
-        private readonly ITodoRepository _todoRepository;
+        private readonly IElementRepository _elementRepository;
 
-        public EditModel(ITodoRepository todoRepository)
+        public EditModel(IElementRepository elementRepository)
         {
-            _todoRepository = todoRepository;
+            _elementRepository = elementRepository;
         }
 
-        public Todo EditTodo { get; private set; }
+        public Element EditElement { get; private set; }
 
         public async Task OnGetAsync(Guid id)
         {
-            await GetEditTodo(id);
+            await GetEditElement(id);
         }
 
-        public async Task<IActionResult> OnPostAsync(Todo todo)
+        public async Task<IActionResult> OnPostAsync(Element element)
         {
             if (ModelState.IsValid)
             {
-                await _todoRepository.Update(todo);
+                await _elementRepository.Update(element);
                 return RedirectToPage("Index");
             }
             return RedirectToPage();
         }
 
-        private async Task GetEditTodo(Guid id)
+        private async Task GetEditElement(Guid id)
         {
-            EditTodo = await _todoRepository.Find(id);
+            EditElement = await _elementRepository.Find(id);
         }
     }
 }

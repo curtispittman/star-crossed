@@ -1,48 +1,94 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Star-Crossed";
+    var test = "";
 }
-<h1>Todo List</h1>
-<h4>Add a todo</h4>
+
+<h1>Star-Crossed List</h1>
+<br />
+<form asp-page="Index" asp-page-handler="ClearList" method="post" class="form-inline">
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span> Clear List</button>
+</form>
+<br />
+<h4>Add an element</h4>
 <p class="text-success">@Model.Message</p>
+
 <form asp-page="Index" method="post" class="form-inline">
     <input type="text" id="Description" name="Description" class="form-control" placeholder="Description" />
     <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</button>
 </form>
-<div asp-validation-summary="All"></div>
-<h4>Current Todo's</h4>
 
-@if (!Model.Todos.Any())
+<br />
+
+<div asp-validation-summary="All"></div>
+<h4>Current Elements</h4>
+
+@if (Model.Elements == null || !Model.Elements.Any())
 {
-<p class="empty">The list is empty</p>
+    <p class="empty">The list is empty</p>
 }
 else
 {
-<ul class="list-unstyled">
-@foreach (var todo in Model.Todos)
-{
-    <li>
-        <form method="post" asp-page="Index" asp-page-handler="Remove" style="display: inline">
-            <input type="hidden" name="Id" value="@todo.Id" />
-            <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-trash"></span></button>
-        </form>
-        <form method="post" asp-page="Index" asp-page-handler="Edit" style="display: inline">
-            <input type="hidden" name="Id" value="@todo.Id" />
-            <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-edit"></span></button>
-        </form>
-        @todo.Description
-    </li>
+    <ul class="list-unstyled">
+        @foreach (var element in Model.Elements.Where(e => !e.IsCrossed))
+        {
+
+        <li>
+            @element.Description
+
+            <form method="post" asp-page="Index" asp-page-handler="Cross" style="display: inline">
+                <input type="hidden" name="Id" value="@element.Id" />
+                <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-remove"></span></button>
+            </form>
+            @if (element.IsStarred)
+    {
+        @*<form method="post" asp-page="Index" asp-page-handler="UnStar" style="display: inline">
+        <input type="hidden" name="Id" value="@element.Id" />
+        <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-star"></span></button>
+    </form>*@
+        <span class="glyphicon glyphicon-star"></span>
 }
-</ul>
+else if (element.WasStarred)
+{
+
+        <span class="glyphicon glyphicon-star-empty"></span>
+}
+else
+{
+        <form method="post" asp-page="Index" asp-page-handler="Star" style="display: inline">
+            <input type="hidden" name="Id" value="@element.Id" />
+            <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-star-empty"></span></button>
+        </form>
+}
+            <form method="post" asp-page="Index" asp-page-handler="Edit" style="display: inline">
+                <input type="hidden" name="Id" value="@element.Id" />
+                <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-edit"></span></button>
+            </form>
+            <br />
+        </li>
+            
+
+
+        }
+        @foreach (var element in Model.Elements.Where(e => e.IsCrossed))
+        {
+        <li>
+            <del>@element.Description</del>
+            <br />
+        </li>
+
+        }
+    </ul>
 }
 <style>
     .validation-summary-errors ul {
         list-style-type: none;
         color: red;
-        padding:0;
-        margin:0;
+        padding: 0;
+        margin: 0;
     }
+
     .empty {
         color: lightgray;
     }
